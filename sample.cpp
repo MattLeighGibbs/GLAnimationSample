@@ -186,7 +186,8 @@ int		WhichProjection;		// ORTHO or PERSP
 int		Xmouse, Ymouse;			// mouse values
 float	Xrot, Yrot;				// rotation angles in degrees
 bool	cockpit = false;		// whether or not the camera should be in the cockpit
-
+float	TeapotPos = 1.6;
+float	dTeapot = .02;
 // function prototypes:
 
 void	Animate( );
@@ -212,7 +213,7 @@ void	MouseMotion( int, int );
 void	Reset( );
 void	Resize( int, int );
 void	Visibility( int );
-void	DrawHeliBlade();
+void	DrawHeliBlade(bool);
 
 
 void			Axes( float );
@@ -291,6 +292,13 @@ Animate( )
 	int ms = glutGet(GLUT_ELAPSED_TIME);			// milliseconds since the program started
 	ms %= MS_IN_THE_ANIMATION_CYCLE;				// milliseconds in the range 0 to MS_IN_THE_ANIMATION_CYCLE-1
 	Time = (float)ms / (float)MS_IN_THE_ANIMATION_CYCLE;        // [ 0., 1. )
+	
+	if (TeapotPos > 3 || TeapotPos < 1.5)
+	{
+		dTeapot *= -1;
+	}
+
+	TeapotPos += dTeapot;
 
 	// force a call to Display( ) next time it is convenient:
 
@@ -354,6 +362,8 @@ Display( )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity( );
 
+	Animate();
+
 	// set the eye position, look-at position, and up-vector:
 
 	if (cockpit)
@@ -367,14 +377,20 @@ Display( )
 
 	// rotate the scene:
 
-	glRotatef( (GLfloat)Yrot, 0., 1., 0. );
-	glRotatef( (GLfloat)Xrot, 1., 0., 0. );
+	if (!cockpit)
+	{
 
-	// uniformly scale the scene:
+		glRotatef((GLfloat)Yrot, 0., 1., 0.);
+		glRotatef((GLfloat)Xrot, 1., 0., 0.);
 
-	if( Scale < MINSCALE )
-		Scale = MINSCALE;
-	glScalef( (GLfloat)Scale, (GLfloat)Scale, (GLfloat)Scale );
+
+		// uniformly scale the scene:
+
+		if (Scale < MINSCALE)
+			Scale = MINSCALE;
+		glScalef((GLfloat)Scale, (GLfloat)Scale, (GLfloat)Scale);
+	}
+
 
 	// set the fog parameters:
 	// (this is really here to do intensity depth cueing)
@@ -417,6 +433,18 @@ Display( )
 	}
 #endif
 
+	glColor3f(1, 0, 1);
+
+	DrawHeliBlade(true);
+	DrawHeliBlade(false);
+
+	glPushMatrix();
+	glTranslatef(0., TeapotPos, -13.);
+	glRotatef((Time * 360)*10, 0, 1, 0);
+	glColor3f(1, 0, 0);
+	glutWireTeapot(1);
+	glPopMatrix();
+
 	// draw some gratuitous text that just rotates on top of the scene:
 
 	glDisable( GL_DEPTH_TEST );
@@ -439,8 +467,8 @@ Display( )
 	gluOrtho2D( 0., 100.,     0., 100. );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity( );
-	/*glColor3f( 1., 1., 1. );
-	DoRasterString( 5., 5., 0., (char *)"Text That Doesn't" );*/
+	glColor3f( 1., 1., 1. );
+	DoRasterString( 5., 5., 0., (char *)"Text That Doesn't" );
 
 	// swap the double-buffered framebuffers:
 
@@ -740,10 +768,21 @@ InitGraphics( )
 // blade parameters:
 
 
-void DrawHeliBlade(double radius)
+void DrawHeliBlade(bool topBlade)
 {
 	// draw the helicopter blade with radius BLADE_RADIUS and
 	//	width BLADE_WIDTH centered at (0.,0.,0.) in the XY plane
+	double radius = topBlade ? MAIN_BLADE_RADIUS : ROTOR_RADIUS;
+
+	glPushMatrix();
+	if (topBlade)
+	{
+		glRotatef((Time * 360)*25, 0, 1, 0);
+	}
+	else
+	{
+
+	}
 
 	glBegin(GL_TRIANGLES);
 	glVertex2f(radius, BLADE_WIDTH / 2.);
@@ -754,6 +793,7 @@ void DrawHeliBlade(double radius)
 	glVertex2f(0., 0.);
 	glVertex2f(-radius, BLADE_WIDTH / 2.);
 	glEnd();
+	glPopMatrix();
 }
 
 // initialize the display lists that will not change:
@@ -789,21 +829,7 @@ InitLists( )
 	glEnd();
 	glPopMatrix();
 
-	glPushMatrix();
-	glTranslatef(0., 2, -13.);
-
-	glColor3f(1, 0, 0);
-	glutWireTeapot(1);
-
-	glPopMatrix();
-
-	glColor3f(1, 0, 1);
-
-	DrawHeliBlade(ROTOR_RADIUS);
-	DrawHeliBlade(MAIN_BLADE_RADIUS);
 	glEndList();
-
-
 
 
 	// create the axes:
@@ -933,13 +959,13 @@ MouseMotion( int x, int y )
 	int dx = x - Xmouse;		// change in mouse coords
 	int dy = y - Ymouse;
 
-	if( ( ActiveButton & LEFT ) != 0 )
+	if( ( ActiveButton & LEFT ) != 0 && !cockpit)
 	{
 		Xrot += ( ANGFACT*dy );
 		Yrot += ( ANGFACT*dx );
 	}
 
-	if( ( ActiveButton & MIDDLE ) != 0 )
+	if( ( ActiveButton & MIDDLE ) != 0 && !cockpit)
 	{
 		Scale += SCLFACT * (float) ( dx - dy );
 
