@@ -1,1 +1,1 @@
-GFXHW#2
+Just a few animated objects in open GL 
