@@ -399,6 +399,9 @@ Display( )
 		DoOutsideView();
 	}
 
+
+	// draw a heart from 
+    // https://gist.github.com/tuanpt216/6e01873e50528c17a35e
 	glPointSize(1);
 	glColor3ub(255, 0, 0);  // Color Red
 	glBegin(GL_POINTS);
