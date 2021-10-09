@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#define MAIN_BLADE_RADIUS		 5
+#define ROTOR_RADIUS		3
+#define BLADE_WIDTH		 0.4
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -15,6 +18,7 @@
 #include <GL/glu.h>
 #include "glut.h"
 
+#include "heli.550.cpp"
 
 //	This is a sample OpenGL / GLUT program
 //
@@ -169,6 +173,7 @@ GLuint	AxesList;				// list to hold the axes
 int		AxesOn;					// != 0 means to draw the axes
 GLuint	CircleList;				// object display list
 GLuint	StripList;				// object display list
+GLuint	HeliList;
 int		DebugOn;				// != 0 means to print debugging info
 int		DepthCueOn;				// != 0 means to use intensity depth cueing
 int		DepthBufferOn;			// != 0 means to use the z-buffer
@@ -180,7 +185,7 @@ int		WhichColor;				// index into Colors[ ]
 int		WhichProjection;		// ORTHO or PERSP
 int		Xmouse, Ymouse;			// mouse values
 float	Xrot, Yrot;				// rotation angles in degrees
-
+bool	cockpit = false;		// whether or not the camera should be in the cockpit
 
 // function prototypes:
 
@@ -207,6 +212,8 @@ void	MouseMotion( int, int );
 void	Reset( );
 void	Resize( int, int );
 void	Visibility( int );
+void	DrawHeliBlade();
+
 
 void			Axes( float );
 unsigned char *	BmpToTexture( char *, int *, int * );
@@ -218,7 +225,15 @@ void			Cross(float[3], float[3], float[3]);
 float			Dot(float [3], float [3]);
 float			Unit(float [3], float [3]);
 
+void DoCockpitView()
+{
+	gluLookAt(-0.4, 1.8, -4.9, -.4, 1.8, -10, 0, 1, 0);
+}
+void DoOutsideView()
+{
+	gluLookAt(-10, 5, 10, 0, 0, 0, 0, 1, 0);
 
+}
 // main program:
 
 int
@@ -341,7 +356,14 @@ Display( )
 
 	// set the eye position, look-at position, and up-vector:
 
-	gluLookAt( 0, 2, 4.,     0., 1., 0.,     0., 1., 0. );
+	if (cockpit)
+	{
+		DoCockpitView();
+	}
+	else
+	{
+		DoOutsideView();
+	}
 
 	// rotate the scene:
 
@@ -379,6 +401,8 @@ Display( )
 		glCallList( AxesList );
 	}
 
+	glCallList(HeliList);
+
 	// since we are using glScalef( ), be sure normals get unitized:
 
 	glEnable( GL_NORMALIZE );
@@ -389,7 +413,7 @@ Display( )
 		glPushMatrix( );
 			glRotatef( 90.,   0., 1., 0. );
 			glCallList( BoxList );
-		glPopMatrix( );
+		glPopMatrix( ); 
 	}
 #endif
 
@@ -415,8 +439,8 @@ Display( )
 	gluOrtho2D( 0., 100.,     0., 100. );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity( );
-	glColor3f( 1., 1., 1. );
-	DoRasterString( 5., 5., 0., (char *)"Text That Doesn't" );
+	/*glColor3f( 1., 1., 1. );
+	DoRasterString( 5., 5., 0., (char *)"Text That Doesn't" );*/
 
 	// swap the double-buffered framebuffers:
 
@@ -713,6 +737,25 @@ InitGraphics( )
 }
 
 
+// blade parameters:
+
+
+void DrawHeliBlade(double radius)
+{
+	// draw the helicopter blade with radius BLADE_RADIUS and
+	//	width BLADE_WIDTH centered at (0.,0.,0.) in the XY plane
+
+	glBegin(GL_TRIANGLES);
+	glVertex2f(radius, BLADE_WIDTH / 2.);
+	glVertex2f(0., 0.);
+	glVertex2f(radius, -BLADE_WIDTH / 2.);
+
+	glVertex2f(-radius, -BLADE_WIDTH / 2.);
+	glVertex2f(0., 0.);
+	glVertex2f(-radius, BLADE_WIDTH / 2.);
+	glEnd();
+}
+
 // initialize the display lists that will not change:
 // (a display list is a way to store opengl commands in
 //  memory so that they can be played back efficiently at a later time
@@ -723,50 +766,43 @@ InitLists( )
 {
 	glutSetWindow( MainWindow );
 
-	CircleList = glGenLists( 1 );
-	glNewList( CircleList, GL_COMPILE );
+	HeliList = glGenLists( 1 );
+	glNewList( HeliList, GL_COMPILE );
 	
-	// taken and tweaked from our notes :)
+	int i;
+	struct edge* ep;
+	struct point* p0, * p1;
 
-	float dang = 2. * M_PI / (float)(20);
-	float ang = 0.;
-
-	for (int i = 0; i < 50; i++)
+	glPushMatrix();
+	glColor3f(0, 1, 0);
+	glTranslatef(0., -1., 0.);
+	glRotatef(97., 0., 1., 0.);
+	glRotatef(-15., 0., 0., 1.);
+	glBegin(GL_LINES);
+	for (i = 0, ep = Heliedges; i < Helinedges; i++, ep++)
 	{
-		glColor3ub(rand() % 255, rand() % 255, rand() % 255);
-		glBegin(GL_LINE_LOOP);
-
-			for (int j = 0; j < 50; j++)
-			{
-				glVertex3f(cos(ang), ((float)i/17), sin(ang));
-				ang += dang;
-			}
-		glEnd();
+		p0 = &Helipoints[ep->p0];
+		p1 = &Helipoints[ep->p1];
+		glVertex3f(p0->x, p0->y, p0->z);
+		glVertex3f(p1->x, p1->y, p1->z);
 	}
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0., 2, -13.);
+
+	glColor3f(1, 0, 0);
+	glutWireTeapot(1);
+
+	glPopMatrix();
+
+	glColor3f(1, 0, 1);
+
+	DrawHeliBlade(ROTOR_RADIUS);
+	DrawHeliBlade(MAIN_BLADE_RADIUS);
 	glEndList();
 
-	StripList = glGenLists(1);
-	glNewList(StripList, GL_COMPILE);
-
-	int count = 0;
-	glColor3ub(0, rand() % 255, rand() % 255);
-	glBegin(GL_TRIANGLE_STRIP);
-		for (int i = 0; i < 3; i++)
-		{
-			glVertex3f((i % 2) +2, i, 0);
-		}
-	glEnd();
-
-	glColor3ub(rand() % 255, 0, rand() % 255);
-	glBegin(GL_TRIANGLE_STRIP);
-	for (int i = 0; i < 3; i++)
-	{
-		glVertex3f(-(i % 2) - 2, i, 0);
-	}
-	glEnd();
-
-
-	glEndList( );
 
 
 
@@ -806,6 +842,13 @@ Keyboard( unsigned char c, int x, int y )
 		case ESCAPE:
 			DoMainMenu( QUIT );	// will not return here
 			break;				// happy compiler
+
+		case 'c':
+			cockpit = true;
+			break;
+		case 'x':
+			cockpit = false;
+			break;
 
 		default:
 			fprintf( stderr, "Don't know what to do with keyboard hit: '%c' (0x%0x)\n", c, c );

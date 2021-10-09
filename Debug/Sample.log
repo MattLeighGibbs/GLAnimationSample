@@ -1,10 +1,11 @@
 ﻿  sample.cpp
-D:\Development\SampleFreeGlut2019\sample.cpp(731,38): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\Development\SampleFreeGlut2019\sample.cpp(741,44): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-D:\Development\SampleFreeGlut2019\sample.cpp(741,19): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-D:\Development\SampleFreeGlut2019\sample.cpp(756,27): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-D:\Development\SampleFreeGlut2019\sample.cpp(756,23): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-D:\Development\SampleFreeGlut2019\sample.cpp(764,28): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
-D:\Development\SampleFreeGlut2019\sample.cpp(764,23): warning C4244: 'argument': conversion from 'int' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(747,37): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(747,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(749,38): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(749,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(751,39): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(751,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(753,38): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(753,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
 sample.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
-  Sample.vcxproj -> D:\Development\SampleFreeGlut2019\Debug\Sample.exe
+  Sample.vcxproj -> D:\Development\GFXHW#2\Debug\Sample.exe

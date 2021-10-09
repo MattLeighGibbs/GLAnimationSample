@@ -1,3 +1,5 @@
 C:\MJB\CS550\SampleFreeGlut2019\Debug\Sample.exe
 D:\Development\SampleFreeGlut2019\Debug\Sample.exe
 D:\Development\SampleFreeGlut2019\Debug\Sample.pdb
+D:\Development\GFXHW#2\Debug\Sample.exe
+D:\Development\GFXHW#2\Debug\Sample.pdb
