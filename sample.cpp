@@ -5,6 +5,8 @@
 #define MAIN_BLADE_RADIUS		 5
 #define ROTOR_RADIUS		3
 #define BLADE_WIDTH		 0.4
+#define LARGE_BLADE_SPEED 25
+#define SMALL_BLADE_SPEED 50
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -185,7 +187,7 @@ int		WhichColor;				// index into Colors[ ]
 int		WhichProjection;		// ORTHO or PERSP
 int		Xmouse, Ymouse;			// mouse values
 float	Xrot, Yrot;				// rotation angles in degrees
-bool	cockpit = false;		// whether or not the camera should be in the cockpit
+bool	cockpit;		// whether or not the camera should be in the cockpit
 float	TeapotPos = 1.6;
 float	dTeapot = .02;
 // function prototypes:
@@ -193,6 +195,7 @@ float	dTeapot = .02;
 void	Animate( );
 void	Display( );
 void	DoAxesMenu( int );
+void	DoCameraMenu(int);
 void	DoColorMenu( int );
 void	DoDepthBufferMenu( int );
 void	DoDepthFightingMenu( int );
@@ -213,7 +216,9 @@ void	MouseMotion( int, int );
 void	Reset( );
 void	Resize( int, int );
 void	Visibility( int );
-void	DrawHeliBlade(bool);
+void	DrawHeliBlade(bool);  
+void	UpdateTeapot();
+
 
 
 void			Axes( float );
@@ -226,6 +231,9 @@ void			Cross(float[3], float[3], float[3]);
 float			Dot(float [3], float [3]);
 float			Unit(float [3], float [3]);
 
+/// <summary>
+/// View requirements for assignment
+/// </summary>
 void DoCockpitView()
 {
 	gluLookAt(-0.4, 1.8, -4.9, -.4, 1.8, -10, 0, 1, 0);
@@ -233,10 +241,9 @@ void DoCockpitView()
 void DoOutsideView()
 {
 	gluLookAt(-10, 5, 10, 0, 0, 0, 0, 1, 0);
-
 }
-// main program:
 
+// main program:
 int
 main( int argc, char *argv[ ] )
 {
@@ -293,12 +300,8 @@ Animate( )
 	ms %= MS_IN_THE_ANIMATION_CYCLE;				// milliseconds in the range 0 to MS_IN_THE_ANIMATION_CYCLE-1
 	Time = (float)ms / (float)MS_IN_THE_ANIMATION_CYCLE;        // [ 0., 1. )
 	
-	if (TeapotPos > 3 || TeapotPos < 1.5)
-	{
-		dTeapot *= -1;
-	}
-
-	TeapotPos += dTeapot;
+	UpdateTeapot();
+	//UpdateTorus();
 
 	// force a call to Display( ) next time it is convenient:
 
@@ -307,6 +310,27 @@ Animate( )
 }
 
 
+void UpdateTeapot()
+{
+	if (TeapotPos > 3 || TeapotPos < 1.5)
+	{
+		dTeapot *= -1;
+	}
+
+	TeapotPos += dTeapot;
+
+}
+//
+//void UpdateTorus()
+//{
+//	if (TeapotPos > 3 || TeapotPos < 1.5)
+//	{
+//		dTeapot *= -1;
+//	}
+//
+//	TeapotPos += dTeapot;
+//
+//}
 // draw the complete scene:
 
 void
@@ -375,6 +399,19 @@ Display( )
 		DoOutsideView();
 	}
 
+	glPointSize(1);
+	glColor3ub(255, 0, 0);  // Color Red
+	glBegin(GL_POINTS);
+	for (float x = -1.139; x <= 1.139; x += 0.001)
+	{
+		float delta = cbrt(x * x) * cbrt(x * x) - 4 * x * x + 4;
+		float y1 = (cbrt(x * x) + sqrt(delta)) / 2;
+		float y2 = (cbrt(x * x) - sqrt(delta)) / 2;
+		glVertex2f(x, y1);
+		glVertex2f(x, y2);
+	}
+	glEnd();
+
 	// rotate the scene:
 
 	if (!cockpit)
@@ -433,7 +470,7 @@ Display( )
 	}
 #endif
 
-	glColor3f(1, 0, 1);
+	glColor3f(.4, .4, .4);
 
 	DrawHeliBlade(true);
 	DrawHeliBlade(false);
@@ -444,6 +481,15 @@ Display( )
 	glColor3f(1, 0, 0);
 	glutWireTeapot(1);
 	glPopMatrix();
+
+
+	glPushMatrix();
+	glTranslatef(0., TeapotPos, -13.);
+	glRotatef((Time * 360) * 10, 0, 0, 1);
+	glColor3f(.2, 1, .4);
+	glutWireTorus(1,.5, 5,5);
+	glPopMatrix();
+
 
 	// draw some gratuitous text that just rotates on top of the scene:
 
@@ -468,7 +514,7 @@ Display( )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity( );
 	glColor3f( 1., 1., 1. );
-	DoRasterString( 5., 5., 0., (char *)"Text That Doesn't" );
+	DoRasterString( 5., 5., 0., (char *)"Hint: Click 'O' for an accidental easter egg" );
 
 	// swap the double-buffered framebuffers:
 
@@ -532,6 +578,14 @@ DoDepthMenu( int id )
 	DepthCueOn = id;
 	glutSetWindow( MainWindow );
 	glutPostRedisplay( );
+}
+
+void
+DoCameraMenu(int id)
+{
+	cockpit = id;
+	glutSetWindow(MainWindow);
+	glutPostRedisplay();
 }
 
 
@@ -661,6 +715,10 @@ InitMenus( )
 	glutAddSubMenu(   "Axes",          axesmenu);
 	glutAddSubMenu(   "Colors",        colormenu);
 
+	int camMenu = glutCreateMenu(DoCameraMenu);
+	glutAddMenuEntry("Outside", 0);
+	glutAddMenuEntry("Cockpit", 1);
+
 #ifdef DEMO_DEPTH_BUFFER
 	glutAddSubMenu(   "Depth Buffer",  depthbuffermenu);
 #endif
@@ -673,6 +731,10 @@ InitMenus( )
 	glutAddSubMenu(   "Projection",    projmenu );
 	glutAddMenuEntry( "Reset",         RESET );
 	glutAddSubMenu(   "Debug",         debugmenu);
+
+	// stack overflow exception :( ? 
+	// glutAddSubMenu(   "Camera Mode",   camMenu); 
+
 	glutAddMenuEntry( "Quit",          QUIT );
 
 // attach the pop-up menu to the right mouse button:
@@ -767,7 +829,10 @@ InitGraphics( )
 
 // blade parameters:
 
-
+/// <summary>
+/// 
+/// </summary>
+/// <param name="topBlade"></param>
 void DrawHeliBlade(bool topBlade)
 {
 	// draw the helicopter blade with radius BLADE_RADIUS and
@@ -777,11 +842,14 @@ void DrawHeliBlade(bool topBlade)
 	glPushMatrix();
 	if (topBlade)
 	{
-		glRotatef((Time * 360)*25, 0, 1, 0);
+		glTranslatef(0, 2.9, -2);
+		glRotatef((Time * 360) * LARGE_BLADE_SPEED, 0, 1, 0);
 	}
 	else
 	{
-
+		glTranslatef(0.5, 2.5, 9.);
+		glRotatef(90, 0, 0, 1);
+		glRotatef((Time * 360)* SMALL_BLADE_SPEED, 0, 1, 0);
 	}
 
 	glBegin(GL_TRIANGLES);
@@ -795,7 +863,17 @@ void DrawHeliBlade(bool topBlade)
 	glEnd();
 	glPopMatrix();
 }
-
+void TransformBigHeliBlade()
+{
+	glTranslatef(0., 2.9, -2.);
+	glRotatef((Time * 360) * (LARGE_BLADE_SPEED), 0, 1, 0);
+}
+void TransformSmallHeliBlade()
+{
+	glTranslatef(0.5, 2.5, 9.);
+	glRotatef(90, 0, 0, 1);
+	glRotatef((Time * 360) * SMALL_BLADE_SPEED, 0, 1, 0);
+}
 // initialize the display lists that will not change:
 // (a display list is a way to store opengl commands in
 //  memory so that they can be played back efficiently at a later time

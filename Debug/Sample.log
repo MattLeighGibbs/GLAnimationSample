@@ -1,13 +1,22 @@
 ﻿  sample.cpp
-D:\Development\GFXHW#2\sample.cpp(189,22): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\Development\GFXHW#2\sample.cpp(190,20): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\Development\GFXHW#2\sample.cpp(788,37): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-D:\Development\GFXHW#2\sample.cpp(788,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-D:\Development\GFXHW#2\sample.cpp(790,38): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-D:\Development\GFXHW#2\sample.cpp(790,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-D:\Development\GFXHW#2\sample.cpp(792,39): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-D:\Development\GFXHW#2\sample.cpp(792,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-D:\Development\GFXHW#2\sample.cpp(794,38): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-D:\Development\GFXHW#2\sample.cpp(794,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(191,22): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Development\GFXHW#2\sample.cpp(192,20): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Development\GFXHW#2\sample.cpp(405,2): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Development\GFXHW#2\sample.cpp(405,47): warning C4305: '+=': truncation from 'double' to 'float'
+D:\Development\GFXHW#2\sample.cpp(407,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(408,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(409,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(473,22): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(489,21): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(845,26): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(856,37): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(856,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(858,38): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(858,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(860,39): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(860,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(862,38): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+D:\Development\GFXHW#2\sample.cpp(862,13): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\Development\GFXHW#2\sample.cpp(868,27): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
 sample.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
   Sample.vcxproj -> D:\Development\GFXHW#2\Debug\Sample.exe
